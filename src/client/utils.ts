@@ -11,7 +11,7 @@ import {Keypair, Connection} from '@solana/web3.js';
 export async function newAccountWithLamports(
   connection: Connection,
   lamports = 1000000,
-): Promise<Keypair> {
+): Promise<Keypair> { //Keypair represent private and public key for an account
   const keypair = Keypair.generate();
   const signature = await connection.requestAirdrop(
     keypair.publicKey,
@@ -56,7 +56,7 @@ export async function getRpcUrl(): Promise<string> {
 /**
  * Load and parse the Solana CLI config file to determine which payer to use
  */
-export async function getPayer(): Promise<Keypair> {
+export async function getPayer(): Promise<Keypair> { //generate keypair of source account
   try {
     const config = await getConfig();
     if (!config.keypair_path) throw new Error('Missing keypair path');

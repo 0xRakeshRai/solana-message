@@ -1,5 +1,6 @@
 use borsh::{BorshDeserialize, BorshSerialize};
 use solana_program::{
+    log::sol_log_compute_units,
     account_info::{next_account_info, AccountInfo},
     entrypoint,
     entrypoint::ProgramResult,
@@ -12,7 +13,7 @@ use solana_program::{
 #[derive(BorshSerialize, BorshDeserialize, Debug)]
 pub struct GreetingAccount {
     /// number of greetings
-    pub counter: u32,
+    pub txt: String,
 }
 
 // Declare and export the program's entrypoint
@@ -22,7 +23,7 @@ entrypoint!(process_instruction);
 pub fn process_instruction(
     program_id: &Pubkey, // Public key of the account the hello world program was loaded into
     accounts: &[AccountInfo], // The account to say hello to
-    _instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
+    instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
 ) -> ProgramResult {
     msg!("Hello World Rust program entrypoint");
 
@@ -39,11 +40,21 @@ pub fn process_instruction(
     }
 
     // Increment and store the number of times the account has been greeted
-    let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
-    greeting_account.counter += 1;
-    greeting_account.serialize(&mut &mut account.data.borrow_mut()[..])?;
+    //decoding the data from byte format to GreetingAccount Format and pushing in greeting_account
+   // let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
+   msg!("start instruction decode");
+   let message = GreetingAccount::try_from_slice(instruction_data).map_err(|err|{
+       msg!("Receiving msg as utf failed, {:?}",err);
+       ProgramError::InvalidInstructionData
+   })?; 
+   msg!("Greeting passed to program {:?}",message);
 
-    msg!("Greeted {} time(s)!", greeting_account.counter);
+   let data = &mut &mut account.data.borrow_mut();
+   msg!("start save instruction into data {:?} , {:?}",data,instruction_data);
+   data[..instruction_data.len()].copy_from_slice(&instruction_data);
+
+   sol_log_compute_units();
+   msg!("Was Sent message {:?}",message.txt);
 
     Ok(())
 }

@@ -20,10 +20,10 @@ async function main() {
   await establishPayer();
 
   // Check if the program has been deployed
-  await checkProgram();
+  await checkProgram();//deploy program in BPF loader and makes program readbale and executable
 
   // Say hello to an account
-  await sayHello();
+  await sayHello('Hello World!!!!!!!');
 
   // Find out how many times that account has been greeted
   await reportGreetings();
