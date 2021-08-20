@@ -84,7 +84,7 @@ const GreetingSchema = new Map([
  * The expected size of each greeting account.
  */
 const sampleGreeter = new GreetingAccount();
-sampleGreeter.txt = '000000000000';
+sampleGreeter.txt = '000000000000000000';
 const GREETING_SIZE = borsh.serialize(
   GreetingSchema,
   sampleGreeter,
@@ -146,16 +146,21 @@ export async function establishPayer(): Promise<void> {
  * Check if the hello world BPF program has been deployed
  */
 export async function checkProgram(): Promise<void> {
+
+  //to create new program id
   // Read program id from keypair file
-  try {
-    const programKeypair = await createKeypairFromFile(PROGRAM_KEYPAIR_PATH);
-    programId = programKeypair.publicKey;
-  } catch (err) {
-    const errMsg = (err as Error).message;
-    throw new Error(
-      `Failed to read program keypair at '${PROGRAM_KEYPAIR_PATH}' due to error: ${errMsg}. Program may need to be deployed with \`solana program deploy dist/program/helloworld.so\``,
-    );
-  }
+  // try {
+  //   const programKeypair = await createKeypairFromFile(PROGRAM_KEYPAIR_PATH);
+  //   programId = programKeypair.publicKey; 
+  // } catch (err) {
+  //   const errMsg = (err as Error).message;
+  //   throw new Error(
+  //     `Failed to read program keypair at '${PROGRAM_KEYPAIR_PATH}' due to error: ${errMsg}. Program may need to be deployed with \`solana program deploy dist/program/helloworld.so\``,
+  //   );
+  // }
+
+  //for using already generated program id
+  programId = new PublicKey("FfeVc9gJzPt9ugRVCVdg2aMpHDrgRKP15ZHUCELjY8nQ"); 
 
   // Check if the program has been deployed
   const programInfo = await connection.getAccountInfo(programId);
@@ -174,11 +179,18 @@ export async function checkProgram(): Promise<void> {
 
   // Derive the address (public key) of a greeting account from the program so that it's easy to find later.
   const GREETING_SEED = 'hello';
+  
+
+  //to create new account no
   greetedPubkey = await PublicKey.createWithSeed(
     payer.publicKey,
     GREETING_SEED,
     programId,
   );
+
+  //to use already generated account no
+ // greetedPubkey = new PublicKey("BjGfLiSXuAAVopLEF4QC45NW3Tg5y82XczoHgbJDJsyB");
+
 
   // Check if the greeting account has already been created
   const greetedAccount = await connection.getAccountInfo(greetedPubkey);
@@ -242,6 +254,6 @@ export async function reportGreetings(): Promise<void> {
   );
   console.log(
     greetedPubkey.toBase58(),
-    'has been greeted'
+    'has been greeted', greeting.txt
   );
 }

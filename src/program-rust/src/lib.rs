@@ -20,25 +20,22 @@ pub struct GreetingAccount {
 entrypoint!(process_instruction);
 
 // Program entrypoint's implementation
-pub fn process_instruction(
-    program_id: &Pubkey, // Public key of the account the hello world program was loaded into
-    accounts: &[AccountInfo], // The account to say hello to
+pub fn process_instruction<>(
+     program_id: & Pubkey, // Public key of the account the hello world program was loaded into
+     accounts: & [AccountInfo<>], // The account to say hello to
     instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
 ) -> ProgramResult {
     msg!("Hello World Rust program entrypoint");
 
     // Iterating accounts is safer then indexing
-    let accounts_iter = &mut accounts.iter();
+    let  accounts_iter = &mut accounts.iter();
 
     // Get the account to say hello to
-    let account = next_account_info(accounts_iter)?;
+    let  account = next_account_info(accounts_iter)?;
+
 
     // The account must be owned by the program in order to modify its data
-    if account.owner != program_id {
-        msg!("Greeted account does not have the correct program id");
-        return Err(ProgramError::IncorrectProgramId);
-    }
-
+   
     // Increment and store the number of times the account has been greeted
     //decoding the data from byte format to GreetingAccount Format and pushing in greeting_account
    // let mut greeting_account = GreetingAccount::try_from_slice(&account.data.borrow())?;
@@ -49,8 +46,14 @@ pub fn process_instruction(
    })?; 
    msg!("Greeting passed to program {:?}",message);
 
+ 
+   if account.owner != program_id {
+    return Err(ProgramError::IncorrectProgramId);
+}
+
+
    let data = &mut &mut account.data.borrow_mut();
-   msg!("start save instruction into data {:?} , {:?}",data,instruction_data);
+   msg!("start save instruction into data {:?} , {:?} ",data,instruction_data);
    data[..instruction_data.len()].copy_from_slice(&instruction_data);
 
    sol_log_compute_units();

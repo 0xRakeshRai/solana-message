@@ -23,7 +23,7 @@ async function main() {
   await checkProgram();//deploy program in BPF loader and makes program readbale and executable
 
   // Say hello to an account
-  await sayHello('Hello World!!!!!!!');
+  await sayHello('Hello World!!!!!!?');
 
   // Find out how many times that account has been greeted
   await reportGreetings();
